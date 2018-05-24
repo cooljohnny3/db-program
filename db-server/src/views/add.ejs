@@ -1,0 +1,13 @@
+<%- include('header'); -%>
+
+<form action="/add" method="POST">
+    <label>Title</label>
+    <input type="text" name="title" required><br>
+    <label>Author</label>
+    <input type="text" name="author" required><br>
+    <label>Body</label>
+    <textarea name="body" cols="30" rows="10"></textarea><br>
+    <input type="submit" value="Submit">
+</form>
+
+<%- include('footer'); -%>

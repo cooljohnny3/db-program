@@ -1,0 +1,15 @@
+<%- include('header'); -%>
+
+<form action="/search" method="POST">
+    <label>Field</label>
+    <select name="field">
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="body">Body</option>
+    </select>
+    <label>Value</label>
+    <input type="text" name="value" required>
+    <input type="submit" value="Submit">
+</form>
+
+<%- include('footer'); -%>

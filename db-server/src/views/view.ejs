@@ -1,0 +1,18 @@
+<%- include('header'); -%>
+
+<div>
+    <form action="/edit" method="GET">
+        <input type="hidden" name="id" value=<%= row[0].id %>>
+        <button type="submit">Edit</button>
+    </form>
+    <form action="/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+        <input type="hidden" name="id" value=<%= row[0].id %>>
+        <button type="submit">Delete</button>
+    </form>
+</div>
+
+<h2><%= row[0].title %></h2>
+<h4><%= row[0].author %></h4>
+<p><%= row[0].body %></p>
+
+<%- include('footer'); -%>

@@ -1,0 +1,25 @@
+<%- include('header'); -%>
+
+<h1>Articles</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Body</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if(articles) { %>
+            <% for(a of articles) { %>
+                <tr id=<%= a.id %> class="row">
+                    <td><%= a.title %></td>
+                    <td><%= a.author %></td>
+                    <td><%= a.body %></td>
+                </tr>
+            <% } %>
+        <% } %>
+    </tbody>
+</table>
+
+<%- include('footer'); -%>

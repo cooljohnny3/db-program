@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+}
+
+/* main area */
+.container {
+    width: 95%;
+    margin: 21.4333px auto auto auto;
+}
+
+.container h1{
+    margin-top: 0;
+    text-align: center;
+}
+
+/* navigation */
+nav ul {
+    background-color: gray;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    display: inline-block;
+    padding: 5px;
+}
+
+nav a {
+    font-size: 16px;
+    text-decoration: none;
+    color: black;
+}
+
+nav li:hover {
+    background-color: red;
+}
+
+/* table */
+.container table{
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 5px;
+}
+
+th, tr:nth-child(2n) {
+    background-color: lightgray;
+}
+
+/* look at again */
+td {
+    min-width: 100px;
+}
+
+tr:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+
+input[type=submit] {
+    cursor: pointer;
+}

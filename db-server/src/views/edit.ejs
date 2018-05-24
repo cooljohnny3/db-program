@@ -1,0 +1,15 @@
+<%- include('header'); -%>
+
+<p><% console.log(row[0].id) %></p>
+<form action="/edit" method="POST">
+    <input type="hidden" name="id" value="<%= row[0].id %>">
+    <label>Title</label>
+    <input type="text" name="title" value="<%= row[0].title %>" required><br>
+    <label>Author</label>
+    <input type="text" name="author" value="<%= row[0].author %>" required><br>
+    <label>Body</label>
+    <textarea name="body" cols="30" rows="10"><%= row[0].body %></textarea><br>
+    <input type="submit" value="Submit">
+</form>
+
+<%- include('footer'); -%>
