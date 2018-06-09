@@ -4,7 +4,7 @@
   "description": "Simple knoeledgeapp",
   "main": "src/app.js",
   "scripts": {
-    "start": "node app"
+    "start": "node src/app.js"
   },
   "author": "John Brehm",
   "license": "ISC",

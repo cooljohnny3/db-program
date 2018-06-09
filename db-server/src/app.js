@@ -10,10 +10,11 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }))
 
+// mySQL db info
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'john',
-    password: 'jokerbrehm',
+    user: 'root',
+    password: '',
     database: 'articles'
 });
 
