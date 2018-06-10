@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mysql = require('mysql');
@@ -11,14 +12,12 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }))
 
-/*
 // express-session
 app.use(session({
     secret: 'secret',
     resave: true,
     saveUninitialized: false
 }));
-*/
 
 // mySQL db info
 const article_pool = mysql.createPool({
@@ -35,6 +34,7 @@ const user_pool = mysql.createPool({
     database: 'users'
 });
 
+// TODO: have only certain amount display at a time.  Don't want to list every one
 app.get('/', (req, res) => {
     let query = 'SELECT * FROM articles';
     article_pool.query(query, (err, rows, fields) => {
@@ -47,6 +47,7 @@ app.get('/', (req, res) => {
     })
 });
 
+// TODO: add checking for user which already exists
 app.get('/register', (req, res) => {
     res.render('register');
 })
@@ -67,6 +68,41 @@ app.post('/register', (req, res) => {
                         res.redirect('/');
                     }
                 });
+        }
+    })
+})
+
+app.get('/login', (req, res) => {
+    res.render('login');
+})
+
+app.post('/login', (req, res) => {
+    //query for requested user
+    let query = 'SELECT * FROM users WHERE username LIKE \'%'+req.body.username+'%\';';
+    user_pool.query(query, (err, rows, fields) => {
+        //console.log(rows[0].username);
+        //if error
+        if(err) console.log(err);
+        //else if user exists check password   
+        else if(rows.length > 0){
+            user_pool.query('SELECT pass FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows, fields) => {
+                //console.log(rows[0].pass);
+                //if correct password set session and redirect
+                bcrypt.compare(req.body.pass, rows[0].pass, function(err, result) {
+                    if(result){
+                        console.log('Login successful');
+                        res.redirect('/');
+                    }
+                    else{
+                        //console.log('Incorect password');
+                        res.redirect('/login');
+                    }
+                })
+            });
+        }
+        else{
+            //console.log('Incorect username');
+            res.redirect('/login');
         }
     })
 })

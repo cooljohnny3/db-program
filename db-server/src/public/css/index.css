@@ -36,6 +36,10 @@ nav li:hover {
     background-color: red;
 }
 
+nav .login {
+    float: right;
+}
+
 /* table */
 .container table{
     width: 100%;
