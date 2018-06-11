@@ -16,4 +16,3 @@ CREATE TABLE users (
     pass TEXT, 
     PRIMARY KEY (id)
 );
-INSERT INTO users (username, pass) VALUES ("admin", "password");

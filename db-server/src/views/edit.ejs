@@ -1,6 +1,5 @@
 <%- include('header'); -%>
 
-<p><% console.log(row[0].id) %></p>
 <form action="/edit" method="POST">
     <input type="hidden" name="id" value="<%= row[0].id %>">
     <label>Title</label>

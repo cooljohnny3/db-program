@@ -19,7 +19,6 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// mySQL db info
 const article_pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
@@ -36,20 +35,27 @@ const user_pool = mysql.createPool({
 
 // TODO: have only certain amount display at a time.  Don't want to list every one
 app.get('/', (req, res) => {
-    let query = 'SELECT * FROM articles';
-    article_pool.query(query, (err, rows, fields) => {
-        if(err) console.log(err);
-        else{
-            res.render('list', {
-                articles: rows,
-            });
-        }
-    })
+    if(req.session.user){
+        let query = 'SELECT * FROM articles';
+        article_pool.query(query, (err, rows, fields) => {
+            if(err) console.log(err);
+            else{
+                res.render('list', {
+                    articles: rows,
+                    user: req.session.user
+                });
+            }
+        }) 
+    }
+    else{
+        res.redirect('/login');
+    }
+    
 });
 
 // TODO: add checking for user which already exists
 app.get('/register', (req, res) => {
-    res.render('register');
+    res.render('register', {user: req.session.user});
 })
 
 app.post('/register', (req, res) => {
@@ -73,7 +79,7 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login', { user: ''});
 })
 
 app.post('/login', (req, res) => {
@@ -85,12 +91,13 @@ app.post('/login', (req, res) => {
         if(err) console.log(err);
         //else if user exists check password   
         else if(rows.length > 0){
-            user_pool.query('SELECT pass FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows, fields) => {
+            user_pool.query('SELECT * FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows, fields) => {
                 //console.log(rows[0].pass);
                 //if correct password set session and redirect
                 bcrypt.compare(req.body.pass, rows[0].pass, function(err, result) {
                     if(result){
                         console.log('Login successful');
+                        req.session.user = rows[0];
                         res.redirect('/');
                     }
                     else{
@@ -108,7 +115,12 @@ app.post('/login', (req, res) => {
 })
 
 app.get('/add', (req, res) => {
-    res.render('add');
+    if(req.session.user){
+        res.render('add', {user: req.session.user});
+    }
+    else{
+        res.redirect('/login');
+    }
 })
 
 app.post('/add', (req, res) => {
@@ -122,7 +134,12 @@ app.post('/add', (req, res) => {
 })
 
 app.get('/search', (req, res) => {
-    res.render('search');
+    if(req.session.user){
+        res.render('search', {user: req.session.user});
+    }
+    else{
+        res.redirect('/login');
+    }
 })
 
 app.post('/search' , (req, res) => {
@@ -131,7 +148,8 @@ app.post('/search' , (req, res) => {
         if(err) throw err;
         else{
             res.render('list', {
-                articles: rows
+                articles: rows,
+                user: req.session.user
             });
         }
     })
@@ -140,7 +158,8 @@ app.post('/search' , (req, res) => {
 app.get('/view', (req, res) => {
     article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
         res.render('view', {
-            row: rows
+            row: rows,
+            user: req.session.user
         });
     });
 })
@@ -148,13 +167,14 @@ app.get('/view', (req, res) => {
 app.get('/edit', (req, res) => {
     article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
         res.render('edit', {
-            row: rows
+            row: rows,
+            user: req.session.user
         });
     });
 })
 
 app.post('/edit', (req, res) => {
-    console.log(req.body.id + ' ' + req.body.title + ' ' + req.body.author);
+    //console.log(req.body.id + ' ' + req.body.title + ' ' + req.body.author);
     article_pool.query('UPDATE articles SET title=?, author=?, body=? WHERE id='+req.body.id, [req.body.title, req.body.author, req.body.body], console.log('Updating article'));
     setTimeout(() => res.redirect('/'), 1000);
 })
