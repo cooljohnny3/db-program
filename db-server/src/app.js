@@ -19,6 +19,17 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// Middleware for checking login
+function requireLogin(req, res, next){
+    if(req.session.user)
+        return next();
+    else{
+        var err = new Error('You must be logged in to view this page.');
+        err.status = 401;
+        return next(err);
+    }
+}
+
 // TODO: Look into if should use pools for wach of these.  Maybe only need for one
 const article_pool = mysql.createPool({
     host: 'localhost',
@@ -35,32 +46,22 @@ const user_pool = mysql.createPool({
 });
 
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
-app.get('/', (req, res) => {
-    if(req.session.user){
-        let query = 'SELECT * FROM articles';
-        article_pool.query(query, (err, rows, fields) => {
-            if(err) console.log(err);
-            else{
-                res.render('list', {
-                    articles: rows,
-                    user: req.session.user
-                });
-            }
-        }) 
-    }
-    else{
-        res.redirect('/login');
-    }
-    
+app.get('/', requireLogin, (req, res) => {
+    let query = 'SELECT * FROM articles';
+    article_pool.query(query, (err, rows, fields) => {
+        if(err) console.log(err);
+        else{
+            res.render('list', {
+                articles: rows,
+                user: req.session.user
+            });
+        }
+    }) 
 });
 
-app.get('/register', (req, res) => {
-    if(req.session.user){
-        res.render('register', {user: req.session.user});
-    }
-    else{
-        res.redirect('/login');
-    }
+app.get('/register', requireLogin, (req, res) => {
+    res.render('register', {user: req.session.user});
+
 })
 
 // TODO: add checking for user which already exists
@@ -117,18 +118,13 @@ app.post('/login', (req, res) => {
     })
 })
 
-app.get('/logout', (req, res) => {
+app.get('/logout', requireLogin, (req, res) => {
     req.session.user = '';
     res.redirect('/login')
 })
 
-app.get('/add', (req, res) => {
-    if(req.session.user){
-        res.render('add', {user: req.session.user});
-    }
-    else{
-        res.redirect('/login');
-    }
+app.get('/add', requireLogin, (req, res) => {
+    res.render('add', {user: req.session.user});
 })
 
 app.post('/add', (req, res) => {
@@ -141,13 +137,8 @@ app.post('/add', (req, res) => {
     setTimeout(() => res.redirect('/'), 1000);
 })
 
-app.get('/search', (req, res) => {
-    if(req.session.user){
-        res.render('search', {user: req.session.user});
-    }
-    else{
-        res.redirect('/login');
-    }
+app.get('/search', requireLogin, (req, res) => {
+    res.render('search', {user: req.session.user});
 })
 
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
@@ -164,7 +155,7 @@ app.post('/search' , (req, res) => {
     })
 })
 
-app.get('/view', (req, res) => {
+app.get('/view', requireLogin, (req, res) => {
     article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
         res.render('view', {
             row: rows,
@@ -173,7 +164,7 @@ app.get('/view', (req, res) => {
     });
 })
 
-app.get('/edit', (req, res) => {
+app.get('/edit', requireLogin, (req, res) => {
     article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
         res.render('edit', {
             row: rows,
@@ -183,12 +174,11 @@ app.get('/edit', (req, res) => {
 })
 
 app.post('/edit', (req, res) => {
-    //console.log(req.body.id + ' ' + req.body.title + ' ' + req.body.author);
     article_pool.query('UPDATE articles SET title=?, author=?, body=? WHERE id='+req.body.id, [req.body.title, req.body.author, req.body.body], console.log('Updating article'));
     setTimeout(() => res.redirect('/'), 1000);
 })
 
-app.post('/delete', (req, res) => {
+app.post('/delete', requireLogin, (req, res) => {
     article_pool.query('DELETE FROM articles WHERE id = ' + req.body.id, console.log('Deleting article'));
     setTimeout(() => res.redirect('/'), 1000);
 })
