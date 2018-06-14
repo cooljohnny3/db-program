@@ -19,6 +19,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// TODO: Look into if should use pools for wach of these.  Maybe only need for one
 const article_pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
@@ -33,7 +34,7 @@ const user_pool = mysql.createPool({
     database: 'users'
 });
 
-// TODO: have only certain amount display at a time.  Don't want to list every one
+// TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
 app.get('/', (req, res) => {
     if(req.session.user){
         let query = 'SELECT * FROM articles';
@@ -53,11 +54,17 @@ app.get('/', (req, res) => {
     
 });
 
-// TODO: add checking for user which already exists
 app.get('/register', (req, res) => {
-    res.render('register', {user: req.session.user});
+    if(req.session.user){
+        res.render('register', {user: req.session.user});
+    }
+    else{
+        res.redirect('/login');
+    }
 })
 
+// TODO: add checking for user which already exists
+// TODO: Password confirmation check.  Do in page js
 app.post('/register', (req, res) => {
     let userData = {
         username: req.body.username, 
@@ -86,13 +93,11 @@ app.post('/login', (req, res) => {
     //query for requested user
     let query = 'SELECT * FROM users WHERE username LIKE \'%'+req.body.username+'%\';';
     user_pool.query(query, (err, rows, fields) => {
-        //console.log(rows[0].username);
         //if error
         if(err) console.log(err);
         //else if user exists check password   
         else if(rows.length > 0){
             user_pool.query('SELECT * FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows, fields) => {
-                //console.log(rows[0].pass);
                 //if correct password set session and redirect
                 bcrypt.compare(req.body.pass, rows[0].pass, function(err, result) {
                     if(result){
@@ -101,17 +106,20 @@ app.post('/login', (req, res) => {
                         res.redirect('/');
                     }
                     else{
-                        //console.log('Incorect password');
                         res.redirect('/login');
                     }
                 })
             });
         }
         else{
-            //console.log('Incorect username');
             res.redirect('/login');
         }
     })
+})
+
+app.get('/logout', (req, res) => {
+    req.session.user = '';
+    res.redirect('/login')
 })
 
 app.get('/add', (req, res) => {
@@ -142,10 +150,11 @@ app.get('/search', (req, res) => {
     }
 })
 
+// TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
 app.post('/search' , (req, res) => {
     let query = 'SELECT * FROM articles WHERE '+req.body.field+' LIKE \'%'+req.body.value+'%\';';
     article_pool.query(query, (err, rows, fields) => {
-        if(err) throw err;
+        if(err) console.log(err);
         else{
             res.render('list', {
                 articles: rows,

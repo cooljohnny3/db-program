@@ -14,7 +14,12 @@
             <li><a href="/">Home</a></li>
             <li><a href="/add">Add</a></li>
             <li><a href="/search">Search</a></li>
-            <li class="username"><%= user.username %></li>
+            <% if (user) { %>
+                <div class="username">
+                        <li><%= user.username %></li>
+                    <li><a href="/logout">Logout</a></li>
+                </div>
+            <% } %>
         </ul>
     </nav>
     <div class="container">
