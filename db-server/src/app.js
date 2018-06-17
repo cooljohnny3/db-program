@@ -24,13 +24,13 @@ function requireLogin(req, res, next){
     if(req.session.user)
         return next();
     else{
-        var err = new Error('You must be logged in to view this page.');
+        var err = new Error('You must be logged in to view this page. Go back and Log in');
         err.status = 401;
         return next(err);
     }
 }
 
-// TODO: Look into if should use pools for wach of these.  Maybe only need for one
+// TODO: Look into if should use pools for each of these.  Maybe only need for one
 const article_pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
@@ -46,7 +46,7 @@ const user_pool = mysql.createPool({
 });
 
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
-app.get('/', requireLogin, (req, res) => {
+app.get('/', (req, res) => {
     let query = 'SELECT * FROM articles';
     article_pool.query(query, (err, rows, fields) => {
         if(err) console.log(err);
@@ -155,7 +155,7 @@ app.post('/search' , (req, res) => {
     })
 })
 
-app.get('/view', requireLogin, (req, res) => {
+app.get('/view', (req, res) => {
     article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
         res.render('view', {
             row: rows,
