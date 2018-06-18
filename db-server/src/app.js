@@ -33,15 +33,15 @@ function requireLogin(req, res, next){
 // TODO: Look into if should use pools for each of these.  Maybe only need for one
 const article_pool = mysql.createPool({
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'serveruser',
+    password: 'password',
     database: 'articles'
 });
 
 const user_pool = mysql.createPool({
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'serveruser',
+    password: 'password',
     database: 'users'
 });
 

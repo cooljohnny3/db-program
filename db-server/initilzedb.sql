@@ -1,3 +1,6 @@
+USE mysql;
+GRANT ALL PRIVILEGES ON *.* TO 'serveruser'@'localhost' IDENTIFIED BY 'password';
+
 CREATE DATABASE articles;
 USE articles;
 CREATE TABLE articles (
