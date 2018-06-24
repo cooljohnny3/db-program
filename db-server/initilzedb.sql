@@ -1,5 +1,6 @@
 USE mysql;
-GRANT ALL PRIVILEGES ON *.* TO 'serveruser'@'localhost' IDENTIFIED BY 'password';
+CREATE USER 'serveruser'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'serveruser'@'localhost';
 
 CREATE DATABASE articles;
 USE articles;
@@ -19,3 +20,5 @@ CREATE TABLE users (
     pass TEXT, 
     PRIMARY KEY (id)
 );
+
+INSERT INTO users (username, pass) VALUES ('admin', '$2a$10$9e0MGdsiL4XYhfkAg717ROCWDeUzRofPTvLDqYdVIglRmH7Ku3iZ6');

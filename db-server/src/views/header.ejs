@@ -19,8 +19,9 @@
                     <li><%= user.username %></li>
                     <li><a href="/logout">Logout</a></li>
                 </div>
-            <% } else %>
+            <% } else { %>
                 <li class="username"><a href="/login">Login</a></li>
+            <% } %>
         </ul>
     </nav>
     <div class="container">

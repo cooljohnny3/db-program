@@ -19,17 +19,19 @@ nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    overflow: hidden
 }
 
 nav li {
-    display: inline-block;
-    padding: 5px;
+    float: left;
 }
 
 nav a {
-    font-size: 16px;
-    text-decoration: none;
+    display: block;
     color: black;
+    text-align: center;
+    padding: 5px 8px;
+    text-decoration: none;
 }
 
 nav li:hover {

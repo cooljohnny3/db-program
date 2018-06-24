@@ -61,12 +61,11 @@ app.get('/', (req, res) => {
 
 app.get('/register', requireLogin, (req, res) => {
     res.render('register', {user: req.session.user});
-
 })
 
 // TODO: add checking for user which already exists
 // TODO: Password confirmation check.  Do in page js
-app.post('/register', (req, res) => {
+app.post('/register', requireLogin, (req, res) => {
     let userData = {
         username: req.body.username, 
         pass: req.body.pass
@@ -127,7 +126,7 @@ app.get('/add', requireLogin, (req, res) => {
     res.render('add', {user: req.session.user});
 })
 
-app.post('/add', (req, res) => {
+app.post('/add', requireLogin, (req, res) => {
     let userData = {
         title: req.body.title, 
         author: req.body.author, 
@@ -137,7 +136,7 @@ app.post('/add', (req, res) => {
     setTimeout(() => res.redirect('/'), 1000);
 })
 
-app.get('/search', requireLogin, (req, res) => {
+app.get('/search', (req, res) => {
     res.render('search', {user: req.session.user});
 })
 
@@ -173,7 +172,7 @@ app.get('/edit', requireLogin, (req, res) => {
     });
 })
 
-app.post('/edit', (req, res) => {
+app.post('/edit', requireLogin, (req, res) => {
     article_pool.query('UPDATE articles SET title=?, author=?, body=? WHERE id='+req.body.id, [req.body.title, req.body.author, req.body.body], console.log('Updating article'));
     setTimeout(() => res.redirect('/'), 1000);
 })
