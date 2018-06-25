@@ -15,12 +15,12 @@
             <li><a href="/add">Add</a></li>
             <li><a href="/search">Search</a></li>
             <% if (user) { %>
-                <div class="username">
+                <div class="login">
                     <li><%= user.username %></li>
                     <li><a href="/logout">Logout</a></li>
                 </div>
             <% } else { %>
-                <li class="username"><a href="/login">Login</a></li>
+                <li class="login"><a href="/login">Login</a></li>
             <% } %>
         </ul>
     </nav>

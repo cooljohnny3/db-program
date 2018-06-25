@@ -38,7 +38,7 @@ nav li:hover {
     background-color: red;
 }
 
-nav .username {
+.login {
     float: right;
 }
 
@@ -57,6 +57,17 @@ th, td {
 
 th, tr:nth-child(2n) {
     background-color: lightgray;
+}
+
+.number-row-selector a {
+    float: right;
+    padding: 2px;
+    color: black;
+    text-decoration: none;
+}
+
+.number-row-selector a:hover {
+    background-color: red;
 }
 
 /* look at again */

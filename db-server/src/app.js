@@ -47,8 +47,11 @@ const user_pool = mysql.createPool({
 
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
 app.get('/', (req, res) => {
-    let query = 'SELECT * FROM articles';
-    article_pool.query(query, (err, rows, fields) => {
+    let pageNum = 0;
+    let start = pageNum * req.query.numRows;
+    let end = req.query.numRows * (pageNum + 1);
+    let query = 'SELECT * FROM articles LIMIT ' + start + ',' + end + ';';
+    article_pool.query(query, (err, rows) => {
         if(err) console.log(err);
         else{
             res.render('list', {
@@ -97,7 +100,7 @@ app.post('/login', (req, res) => {
         if(err) console.log(err);
         //else if user exists check password   
         else if(rows.length > 0){
-            user_pool.query('SELECT * FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows, fields) => {
+            user_pool.query('SELECT * FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows) => {
                 //if correct password set session and redirect
                 bcrypt.compare(req.body.pass, rows[0].pass, function(err, result) {
                     if(result){
@@ -143,7 +146,7 @@ app.get('/search', (req, res) => {
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
 app.post('/search' , (req, res) => {
     let query = 'SELECT * FROM articles WHERE '+req.body.field+' LIKE \'%'+req.body.value+'%\';';
-    article_pool.query(query, (err, rows, fields) => {
+    article_pool.query(query, (err, rows) => {
         if(err) console.log(err);
         else{
             res.render('list', {
@@ -155,7 +158,7 @@ app.post('/search' , (req, res) => {
 })
 
 app.get('/view', (req, res) => {
-    article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
+    article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows) => {
         res.render('view', {
             row: rows,
             user: req.session.user
@@ -164,7 +167,7 @@ app.get('/view', (req, res) => {
 })
 
 app.get('/edit', requireLogin, (req, res) => {
-    article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows, fields) => {
+    article_pool.query('SELECT * FROM articles WHERE id = ' + req.query.id, (err, rows) => {
         res.render('edit', {
             row: rows,
             user: req.session.user
