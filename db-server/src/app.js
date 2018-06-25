@@ -45,12 +45,25 @@ const user_pool = mysql.createPool({
     database: 'users'
 });
 
-// TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
 app.get('/', (req, res) => {
-    let pageNum = 0;
-    let start = pageNum * req.query.numRows;
-    let end = req.query.numRows * (pageNum + 1);
-    let query = 'SELECT * FROM articles LIMIT ' + start + ',' + end + ';';
+    // If numRows changes set session
+    if(req.query.numRows)
+        req.session.numRows = req.query.numRows;
+
+    let pageNum;
+    let start;
+    let end;
+    let query;
+
+    if(req.session.numRows && req.session.numRows != 'all'){
+        pageNum = 0;
+        start = pageNum * req.session.numRows;
+        end = req.session.numRows * (pageNum + 1);
+        query = 'SELECT * FROM articles LIMIT ' + start + ',' + end + ';';
+        
+    } else 
+        query = 'SELECT * FROM articles;';
+
     article_pool.query(query, (err, rows) => {
         if(err) console.log(err);
         else{
