@@ -15,6 +15,11 @@ body {
 }
 
 /* navigation */
+nav {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
 nav ul {
     background-color: gray;
     list-style: none;
@@ -24,23 +29,25 @@ nav ul {
 }
 
 nav li {
-    float: left;
+    display: inline-block;
+}
+
+nav li * {
+    padding: 5px 8px;
 }
 
 nav a {
     display: block;
     color: black;
-    text-align: center;
-    padding: 5px 8px;
     text-decoration: none;
 }
 
-nav li:hover {
+nav a:hover {
     background-color: red;
 }
 
-.login {
-    float: right;
+.nav-right {
+    text-align: right;
 }
 
 /* table */

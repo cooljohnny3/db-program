@@ -10,18 +10,24 @@
 </head>
 <body>
     <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/add">Add</a></li>
-            <li><a href="/search">Search</a></li>
+        <div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/add">Add</a></li>
+                <li><a href="/search">Search</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
             <% if (user) { %>
-                <div class="login">
-                    <li><%= user.username %></li>
+                <ul>
+                    <li><span><%= user.username %></span></li>
                     <li><a href="/logout">Logout</a></li>
-                </div>
+                </ul>
             <% } else { %>
-                <li class="login"><a href="/login">Login</a></li>
+                <ul>
+                    <li><a href="/login">Login</a></li>
+                </ul>
             <% } %>
-        </ul>
+        </div>
     </nav>
     <div class="container">
