@@ -1,11 +1,21 @@
 <%- include('header'); -%>
 
 <h1>Articles</h1>
-<div class="number-row-selector">
-    <a href="/?numRows=all">All</a>
-    <a href="/?numRows=50">50</a>
-    <a href="/?numRows=25">25</a>
-    <a href="/?numRows=10">10</a>
+<div class="list-controls">
+    <div></div>
+    <div class="page-controls">
+        <% if(page > 1) { %>
+            <a href="/?page=<%= page - 1 %>">&lt;&lt;Prev</a>
+        <% } %>
+        <span><%= page %></span>
+        <a href="/?page=<%= page + 1 %>">Next&gt;&gt;</a>
+    </div>
+    <div class="number-row-selector">
+        <a href="/?numRows=10">10</a>
+        <a href="/?numRows=25">25</a>
+        <a href="/?numRows=50">50</a>
+        <a href="/?numRows=all">All</a>       
+    </div>
 </div>
 <table>
     <thead>
