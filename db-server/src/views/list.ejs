@@ -20,6 +20,7 @@
 <table>
     <thead>
         <tr>
+            <th>ID</th>
             <th>Title</th>
             <th>Author</th>
             <th>Body</th>
@@ -29,6 +30,7 @@
         <% if(articles) { %>
             <% for(a of articles) { %>
                 <tr id="<%= a.id %>" class="row">
+                    <td><%= a.id %></td>
                     <td><%= a.title %></td>
                     <td><%= a.author %></td>
                     <td><%= a.body %></td>

@@ -48,20 +48,17 @@ const user_pool = mysql.createPool({
 app.get('/', (req, res) => {
     let pageNum = 0;
     let start;
-    let end;
     let query;
 
     // If numRows changes set session
     if(req.query.numRows)
         req.session.numRows = req.query.numRows;
     if(req.query.page)
-        pageNum = req.query.page;
+        pageNum = req.query.page - 1;
 
     if(req.session.numRows && req.session.numRows != 'all'){
         start = pageNum * req.session.numRows;
-        end = req.session.numRows * (pageNum + 1);
-        query = 'SELECT * FROM articles LIMIT ' + start + ',' + end + ';';
-        
+        query = 'SELECT * FROM articles LIMIT ' + start + ',' + req.session.numRows + ';';
     } else 
         query = 'SELECT * FROM articles;';
 
@@ -71,7 +68,7 @@ app.get('/', (req, res) => {
             res.render('list', {
                 articles: rows,
                 user: req.session.user,
-                page: pageNum + 1
+                page: pageNum + 1,
             });
         }
     }) 
