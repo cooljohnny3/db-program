@@ -1,12 +1,12 @@
 <%- include('header'); -%>
 
-<form action="/register" onsubmit="return passConf()" method="POST">
+<form class="validateForm" action="/register" onsubmit="return checkPass()" method="POST">
     <label>Username</label>
     <input type="text" name="username" autofocus required><br>
     <label>Password</label>
-    <input type="password" name="pass" required><br>
+    <input type="password" name="pass" id="pass" required><br>
     <label>Retype Password</label>
-    <input type="password" name="passConf" required></input><br>
+    <input type="password" name="passConf" id="passConf"  required><br>
     <input type="submit" value="Submit">
 </form>
 

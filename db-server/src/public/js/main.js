@@ -6,15 +6,13 @@ $(document).ready(() => {
     });
 });
 
-function passConf() {
-    alert("TEST!");
+function checkPass() {
     let pass1 = document.getElementById("pass").value;
     let pass2 = document.getElementById("passConf").value;
     if (pass1 == pass2) {
-        alert("Paswords Match!");
+        return true;
     } else {
-        document.getElementById("pass1").style.borderColor = "#E34234";
-        document.getElementById("pass2").style.borderColor = "#E34234";
         alert("Paswords Don't Match!");
+        return false;
     }
 }
