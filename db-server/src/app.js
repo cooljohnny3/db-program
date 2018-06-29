@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
+const dblib = require('./dblib');
 
 const app = express();
 
@@ -12,15 +13,8 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// express-session
-app.use(session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: false
-}));
-
 // Middleware for checking login
-function requireLogin(req, res, next){
+function requireLogin(req, res, next) {
     if(req.session.user)
         return next();
     else{
@@ -29,6 +23,13 @@ function requireLogin(req, res, next){
         return next(err);
     }
 }
+
+// express-session
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: false
+}));
 
 // TODO: Look into if should use pools for each of these.  Maybe only need for one
 const article_pool = mysql.createPool({
@@ -46,6 +47,8 @@ const user_pool = mysql.createPool({
 });
 
 // TODO sort by column
+// TODO make next>> only appear if there is another page
+// TODO clean up.  extract functions
 app.get('/', (req, res) => {
     let pageNum = 0;
     let start;
@@ -76,27 +79,34 @@ app.get('/', (req, res) => {
 });
 
 app.get('/register', requireLogin, (req, res) => {
-    res.render('register', {user: req.session.user});
+    res.render('register', {
+        user: req.session.user,
+        existing: false
+    });
 })
 
-// TODO: add checking for user which already exists
-// TODO: Password confirmation check.  Do in page js
 app.post('/register', requireLogin, (req, res) => {
     let userData = {
         username: req.body.username, 
         pass: req.body.pass
-    }
-    bcrypt.hash(userData.pass, 10, function (err, hash){
+    };
+
+    // Check for existing user if yues then render register with existing user true
+    let query = 'SELECT * FROM users WHERE username LIKE \'%'+req.body.username+'%\';';
+    user_pool.query(query, (err, rows) => {
+        // if error
         if(err) console.log(err);
-        else {
-            user_pool.query('INSERT INTO users (username, pass) VALUES (?,?)', [userData.username, hash], 
-                (err, rows, fields) => {
-                    if(err) console.log(err);
-                    else{
-                        console.log('Adding User');
-                        res.redirect('/');
-                    }
-                });
+        // else if user exists rerender register with error 
+        else if(rows.length > 0){
+            res.render('register', {
+                user: req.session.user,
+                existing: true
+            });
+        }
+        // else add user
+        else{
+            dblib.addUser(user_pool, userData.username, userData.pass);
+            res.redirect('/');
         }
     })
 })
@@ -157,6 +167,7 @@ app.get('/search', (req, res) => {
 })
 
 // TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
+// Make search and / paths into fuinxction that can be reused
 app.post('/search' , (req, res) => {
     let query = 'SELECT * FROM articles WHERE '+req.body.field+' LIKE \'%'+req.body.value+'%\';';
     article_pool.query(query, (err, rows) => {

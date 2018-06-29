@@ -7,6 +7,7 @@
     <input type="password" name="pass" id="pass" required><br>
     <label>Retype Password</label>
     <input type="password" name="passConf" id="passConf"  required><br>
+    <% if(existing) { %> <p class="red-text">A user with the username already exists.</p> <% } %>
     <input type="submit" value="Submit">
 </form>
 
