@@ -1,8 +1,8 @@
 <%- include('header'); -%>
 
-<form action="/register" method="POST">
+<form action="/register" onsubmit="return passConf()" method="POST">
     <label>Username</label>
-    <input type="text" name="username" required><br>
+    <input type="text" name="username" autofocus required><br>
     <label>Password</label>
     <input type="password" name="pass" required><br>
     <label>Retype Password</label>

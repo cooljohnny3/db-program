@@ -10,7 +10,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // express-session
 app.use(session({
@@ -45,6 +45,7 @@ const user_pool = mysql.createPool({
     database: 'users'
 });
 
+// TODO sort by column
 app.get('/', (req, res) => {
     let pageNum = 0;
     let start;
