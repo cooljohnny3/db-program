@@ -27,3 +27,31 @@ exports.checkLastPage = function(pool, start, numRows, callback) {
             callback(false);
     });
 }
+
+// pass1 is entered password and pass2 is encrypted password
+comparePass = function(pool, username, pass1, pass2, callback) {
+    pool.query('SELECT * FROM users WHERE username LIKE \'%'+username+'%\';', (err, rows) => {
+        bcrypt.compare(pass1, pass2, function(err, result) {
+            if(result)
+                callback(true, rows[0]);
+            else
+                callback(false);
+        })
+    });
+}
+
+// Logsin the user
+exports.login = function(pool, username, password, callback) {
+    let query = 'SELECT * FROM users WHERE username LIKE \'%'+username+'%\';';
+    pool.query(query, (err, rows, fields) => {
+        //if error
+        if(err) console.log(err);
+        // user exists 
+        else if(rows.length > 0){
+            comparePass(pool, rows[0].username, password, rows[0].pass, callback);
+        }
+        else{
+            callback(false);
+        }
+    })
+}

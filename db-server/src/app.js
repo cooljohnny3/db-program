@@ -121,31 +121,16 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    //query for requested user
-    let query = 'SELECT * FROM users WHERE username LIKE \'%'+req.body.username+'%\';';
-    user_pool.query(query, (err, rows, fields) => {
-        //if error
-        if(err) console.log(err);
-        //else if user exists check password   
-        else if(rows.length > 0){
-            user_pool.query('SELECT * FROM users WHERE username LIKE \'%'+rows[0].username+'%\';', (err, rows) => {
-                //if correct password set session and redirect
-                bcrypt.compare(req.body.pass, rows[0].pass, function(err, result) {
-                    if(result){
-                        console.log('Login successful');
-                        req.session.user = rows[0];
-                        res.redirect('/');
-                    }
-                    else{
-                        res.redirect('/login');
-                    }
-                })
-            });
+    dblib.login(user_pool, req.body.username, req.body.pass, (result, data) => {
+        if(result){
+            console.log('Login successful');
+            req.session.user = data;
+            res.redirect('/');
         }
         else{
             res.redirect('/login');
         }
-    })
+    });
 })
 
 app.get('/logout', requireLogin, (req, res) => {
