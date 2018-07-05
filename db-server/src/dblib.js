@@ -17,17 +17,6 @@ exports.addUser = function(pool, username, password) {
     })
 }
 
-// Checks if the list is on the last page
-exports.checkLastPage = function(pool, start, numRows, callback) {
-    pool.query('SELECT COUNT(*) FROM articles;', (err, rows) => {
-        if(err) console.log(err);
-        else if(parseInt(start) + parseInt(numRows) >= rows[0]['COUNT(*)'])
-            callback(true);
-        else
-            callback(false);
-    });
-}
-
 // pass1 is entered password and pass2 is encrypted password
 comparePass = function(pool, username, pass1, pass2, callback) {
     pool.query('SELECT * FROM users WHERE username LIKE \'%'+username+'%\';', (err, rows) => {
@@ -52,6 +41,62 @@ exports.login = function(pool, username, password, callback) {
         }
         else{
             callback(false);
+        }
+    })
+}
+
+countRows = function(pool, query, callback) {
+    pool.query(query,  (err, rows) => {
+        if(err) console.log(err);
+        else callback(rows[0]['COUNT(*)']);
+    })
+}
+
+// Checks if the list is on the last page
+checkLastPage = function(pool, start, numRows, callback, where) {
+    if(where)
+        query = 'SELECT COUNT(*) FROM articles WHERE '+ where.field + ' LIKE '+ where.value+';';
+    else
+        query ='SELECT COUNT(*) FROM articles;';
+
+    countRows(pool, query, (num) => {
+        if(parseInt(start) + parseInt(numRows) >= num)
+            callback(true);
+        else
+            callback(false);
+    })
+}
+
+/*
+Displays the rows of the database.
+Optional 'where' parameter is used to specify a search query
+*/
+exports.display = function(pool, session, newNumRows, page, callback, where) {
+    let pageNum = 0;
+    let start;
+    let last = false;
+    let query = 'SELECT * FROM articles';
+
+    // numRows changes
+    if(newNumRows)
+        session.numRows = newNumRows;
+    // page number changes
+    if(page)
+        pageNum = page - 1;
+
+    if(where)
+        query += ' ' + where;
+
+    if(session.numRows && session.numRows != 'all'){
+        start = pageNum * session.numRows;
+        query += ' LIMIT ' + start + ',' + session.numRows;
+        checkLastPage(pool, start, session.numRows, (result) => {last = result});
+    } else last = true;
+
+    pool.query(query, (err, rows) => {
+        if(err) console.log(err);
+        else{
+            callback(rows, pageNum, last);
         }
     })
 }

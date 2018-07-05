@@ -47,40 +47,15 @@ const user_pool = mysql.createPool({
 });
 
 // TODO sort by column
-// TODO clean up.  extract functions
 app.get('/', (req, res) => {
-    let pageNum = 0;
-    let start;
-    let query;
-    let last = false;
-
-    // If numRows changes set session
-    if(req.query.numRows)
-        req.session.numRows = req.query.numRows;
-    // If page number changes
-    if(req.query.page)
-        pageNum = req.query.page - 1;
-
-    if(req.session.numRows && req.session.numRows != 'all'){
-        start = pageNum * req.session.numRows;
-        query = 'SELECT * FROM articles LIMIT ' + start + ',' + req.session.numRows + ';';
-        dblib.checkLastPage(article_pool, start, req.session.numRows, (result) => {last = result});
-    } else {
-        query = 'SELECT * FROM articles;';
-        last = true;
-    }
-
-    article_pool.query(query, (err, rows) => {
-        if(err) console.log(err);
-        else{
-            res.render('list', {
-                articles: rows,
-                user: req.session.user,
-                page: pageNum + 1,
-                last: last
-            });
-        }
-    }) 
+    dblib.display(article_pool, req.session, req.query.numRows, req.query.page, (rows, pageNum, last) => {
+        res.render('list', {
+            articles: rows,
+            user: req.session.user,
+            page: pageNum + 1,
+            last: last
+        });
+    });
 });
 
 app.get('/register', requireLogin, (req, res) => {
@@ -96,7 +71,7 @@ app.post('/register', requireLogin, (req, res) => {
         pass: req.body.pass
     };
 
-    // Check for existing user if yues then render register with existing user true
+    // Check for existing user if yes then render register with existing user true
     let query = 'SELECT * FROM users WHERE username LIKE \'%'+req.body.username+'%\';';
     user_pool.query(query, (err, rows) => {
         // if error
@@ -156,19 +131,15 @@ app.get('/search', (req, res) => {
     res.render('search', {user: req.session.user});
 })
 
-// TODO: have only certain amount display at a time.  Don't want to list every one 10, 25, 50, all
-// Make search and / paths into fuinxction that can be reused
 app.post('/search' , (req, res) => {
-    let query = 'SELECT * FROM articles WHERE '+req.body.field+' LIKE \'%'+req.body.value+'%\';';
-    article_pool.query(query, (err, rows) => {
-        if(err) console.log(err);
-        else{
-            res.render('list', {
-                articles: rows,
-                user: req.session.user
-            });
-        }
-    })
+    dblib.display(article_pool, req.session, req.query.numRows, req.query.page, (rows, pageNum, last) => {
+        res.render('list', {
+            articles: rows,
+            user: req.session.user,
+            page: pageNum + 1,
+            last: last
+        });
+    }, 'WHERE '+req.body.field+' LIKE \'%'+req.body.value+'%\'');
 })
 
 app.get('/view', (req, res) => {
