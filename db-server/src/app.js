@@ -47,24 +47,28 @@ const user_pool = mysql.createPool({
 });
 
 // TODO sort by column
-// TODO make next>> only appear if there is another page
 // TODO clean up.  extract functions
 app.get('/', (req, res) => {
     let pageNum = 0;
     let start;
     let query;
+    let last = false;
 
     // If numRows changes set session
     if(req.query.numRows)
         req.session.numRows = req.query.numRows;
+    // If page number changes
     if(req.query.page)
         pageNum = req.query.page - 1;
 
     if(req.session.numRows && req.session.numRows != 'all'){
         start = pageNum * req.session.numRows;
         query = 'SELECT * FROM articles LIMIT ' + start + ',' + req.session.numRows + ';';
-    } else 
+        dblib.checkLastPage(article_pool, start, req.session.numRows, (result) => {last = result});
+    } else {
         query = 'SELECT * FROM articles;';
+        last = true;
+    }
 
     article_pool.query(query, (err, rows) => {
         if(err) console.log(err);
@@ -73,6 +77,7 @@ app.get('/', (req, res) => {
                 articles: rows,
                 user: req.session.user,
                 page: pageNum + 1,
+                last: last
             });
         }
     }) 

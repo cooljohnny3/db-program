@@ -8,7 +8,9 @@
             <a href="/?page=<%= page - 1 %>">&lt;&lt;Prev</a>
         <% } %>
         <span><%= page %></span>
+        <% if(!last) { %>
         <a href="/?page=<%= page + 1 %>">Next&gt;&gt;</a>
+        <% } %>
     </div>
     <div class="number-row-selector">
         <a href="/?numRows=10">10</a>
