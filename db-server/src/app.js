@@ -48,7 +48,7 @@ const user_pool = mysql.createPool({
 
 // TODO sort by column
 app.get('/', (req, res) => {
-    dblib.display(article_pool, req.session, req.query.numRows, req.query.page, (rows, pageNum, last) => {
+    dblib.display(article_pool, req.session, req.query, (rows, pageNum, last) => {
         res.render('list', {
             articles: rows,
             user: req.session.user,
@@ -132,7 +132,7 @@ app.get('/search', (req, res) => {
 })
 
 app.post('/search' , (req, res) => {
-    dblib.display(article_pool, req.session, req.query.numRows, req.query.page, (rows, pageNum, last) => {
+    dblib.display(article_pool, req.session, req.query, (rows, pageNum, last) => {
         res.render('list', {
             articles: rows,
             user: req.session.user,

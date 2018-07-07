@@ -71,29 +71,29 @@ checkLastPage = function(pool, start, numRows, callback, where) {
 Displays the rows of the database.
 Optional 'where' parameter is used to specify a search query
 */
-exports.display = function(pool, session, newNumRows, page, callback, where) {
+exports.display = function(pool, session, query, callback, where) {
     let pageNum = 0;
     let start;
     let last = false;
-    let query = 'SELECT * FROM articles';
+    let SQLquery = 'SELECT * FROM articles';
 
     // numRows changes
-    if(newNumRows)
-        session.numRows = newNumRows;
+    if(query.numRows)
+        session.numRows = query.numRows;
     // page number changes
-    if(page)
-        pageNum = page - 1;
+    if(query.page)
+        pageNum = query.page - 1;
 
     if(where)
-        query += ' ' + where;
+        SQLquery += ' ' + where;
 
     if(session.numRows && session.numRows != 'all'){
         start = pageNum * session.numRows;
-        query += ' LIMIT ' + start + ',' + session.numRows;
+        SQLquery += ' LIMIT ' + start + ',' + session.numRows;
         checkLastPage(pool, start, session.numRows, (result) => {last = result});
     } else last = true;
 
-    pool.query(query, (err, rows) => {
+    pool.query(SQLquery, (err, rows) => {
         if(err) console.log(err);
         else{
             callback(rows, pageNum, last);
