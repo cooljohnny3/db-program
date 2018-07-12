@@ -3,7 +3,6 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
 const dblib = require('./dblib');
 
 const app = express();
@@ -46,7 +45,6 @@ const user_pool = mysql.createPool({
     database: 'users'
 });
 
-// TODO sort by column
 app.get('/', (req, res) => {
     dblib.display(article_pool, req.session, req.query, (rows, pageNum, last) => {
         res.render('list', {

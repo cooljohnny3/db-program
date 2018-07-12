@@ -4,6 +4,10 @@ $(document).ready(() => {
     $('.row').click(function() {
         window.location = '/view?id=' + $(this).attr('id');
     });
+    $('.col').click(function() {
+        console.log(this.innerHTML);
+        window.location = '/?order=' + this.innerHTML;
+    });
 });
 
 function checkPass() {

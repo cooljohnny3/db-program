@@ -83,17 +83,35 @@ exports.display = function(pool, session, query, callback, where) {
     // page number changes
     if(query.page)
         pageNum = query.page - 1;
-
+    // Order change
+    if(query.order){
+        // Toggle reverse
+        if(query.order == session.order)
+            session.reverse = !session.reverse;
+        else{
+            session.order = query.order;
+            session.reverse = false;
+        }
+    }
+    // Add WHERE
     if(where)
         SQLquery += ' ' + where;
-
+    // Add ORDER
+    if(session.order){
+        if(!session.reverse)
+            SQLquery += ' ORDER BY ' + session.order;
+        else
+            SQLquery += ' ORDER BY ' + session.order + ' DESC';
+    }
+    // Add LIMIT
+    // Limit has to be at end of SQL query
     if(session.numRows && session.numRows != 'all'){
         start = pageNum * session.numRows;
         SQLquery += ' LIMIT ' + start + ',' + session.numRows;
         checkLastPage(pool, start, session.numRows, (result) => {last = result});
     } else last = true;
 
-    pool.query(SQLquery, (err, rows) => {
+    pool.query(SQLquery + ';', (err, rows) => {
         if(err) console.log(err);
         else{
             callback(rows, pageNum, last);
